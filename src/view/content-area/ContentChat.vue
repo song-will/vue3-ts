@@ -34,10 +34,10 @@ import ChatInput from './ChatInput.vue'
         box-sizing: border-box;
     }
     .chat-content {
-        flex: 1 1 auto;
+        flex: 1 1 400px;
     }
     .chat-input {
-        flex: 0 0 160px;
+        flex: 0 0 200px;
         box-sizing: border-box;
         border-top: 1px solid #ccc;
     }
