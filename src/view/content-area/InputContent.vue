@@ -1,6 +1,12 @@
 <template>
     <div class="input-content-wrapper">
-        <el-input @paste="onPaste" ref="refInput" v-model="inputValue" type="textarea"></el-input  >
+        <el-input
+            @paste="onPaste"
+            ref="refInput"
+            v-model="inputValue"
+            type="textarea"
+            @keydown.enter="handleEnter"
+        ></el-input>
     </div>
 </template>
 <script lang="ts" setup>
@@ -12,9 +18,9 @@ const refInput = ref(null as HTMLElement | null)
 const onPaste = (event: ClipboardEvent) => {
     const items = event.clipboardData?.items
     let file: File | null = null
-    if  (items && items.length) {
+    if (items && items.length) {
         for (let i = 0; i < items.length; i++) {
-            if (items[i].type.indexOf('image') !== -1){
+            if (items[i].type.indexOf('image') !== -1) {
                 file = items[i].getAsFile()
                 break
             }
@@ -27,14 +33,29 @@ const onPaste = (event: ClipboardEvent) => {
     let e = {
         target: {
             files: [file],
-            filename:file.name
+            filename: file.name
         }
     }
-    console.log('e',e)
+    console.log('e', e)
     uploadFile()
 }
+/**
+ * 上传文件
+ */
 const uploadFile = () => {
 
+}
+/**
+ * 处理回车事件
+ */
+const handleEnter = (event: KeyboardEvent): void => {
+    // 当处于中文输入法面板有值时，不触发发送
+    if (event.keyCode === 229) {
+        return
+    }
+    // 取消回车换行
+    event.preventDefault()
+    inputValue.value = ''
 }
 
 </script>
@@ -50,6 +71,8 @@ const uploadFile = () => {
             resize: none;
             border: 0;
             background: transparent;
+            font-size: 12px;
+            color: #333;
         }
     }
 }
