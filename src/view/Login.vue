@@ -19,8 +19,10 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive } from "vue";
-// import { userLogin } from "../api/index";
+import { userLogin } from "../api/index";
 import { useRoute, useRouter } from "vue-router";
+import { useStore } from 'vuex'
+import { key } from '../store'
 
 interface FormData {
   username:string
@@ -31,12 +33,20 @@ const formData = reactive<FormData>({
     username: "",
     password: ""
 });
-
+const store = useStore(key)
+console.log('store', store.state.count)
 const submit = async () => {
-    // const data = await userLogin(formData).catch(err => {
-    //     console.error('err', err)
-    // })
-    // console.log('data', data)
+    const data = await userLogin(formData).catch(err => {
+        console.error('err', err)
+    })
+    console.log('data', data)
+    // store.commit('increment')
+    // console.log('store', store.state.count)
+    store.commit('initSocket', {
+        token: data,
+        connectedCallback () {
+        }
+    })
     linkToHome();
 };
 const router = useRouter();

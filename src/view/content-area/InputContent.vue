@@ -11,6 +11,8 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
+import { key } from '@/store'
+import { useStore } from 'vuex';
 
 const inputValue = ref('')
 const refInput = ref(null as HTMLElement | null)
@@ -45,6 +47,7 @@ const onPaste = (event: ClipboardEvent) => {
 const uploadFile = () => {
 
 }
+const store = useStore(key)
 /**
  * 处理回车事件
  */
@@ -55,8 +58,16 @@ const handleEnter = (event: KeyboardEvent): void => {
     }
     // 取消回车换行
     event.preventDefault()
+    console.log('socketManager', store.state.socketManager.sendMessage)
+    store.state.socketManager.sendMessage(inputValue.value)
     inputValue.value = ''
 }
+const init = () => {
+    store.state.socketManager.bindEvent('on-receive-message', function(msg: string) {
+        console.log('msg', msg)
+    })
+}
+onMounted(init)
 
 </script>
 <style lang="less" scoped>

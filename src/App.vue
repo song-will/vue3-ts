@@ -3,6 +3,11 @@
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 import HelloWorld from "./view/HelloWorld.vue";
 import Login from "./view/Login.vue";
+import { key } from './store/index';
+import { useStore } from 'vuex';
+
+const store = useStore(key)
+
 </script>
 
 <template>

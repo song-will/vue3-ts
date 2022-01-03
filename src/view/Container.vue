@@ -18,6 +18,7 @@ import OperationArea from '@/view/operation-area/OperationArea.vue'
 import SelectionArea from '@/view/selection-area/SelectionArea.vue'
 import ContentArea from '@/view/content-area/ContentArea.vue'
 
+
 const currentType = ref<string>('CHAT')
 const changeCurrentType = (type:string):void => {
     currentType.value = type

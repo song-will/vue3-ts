@@ -23,23 +23,15 @@ class SocketManager {
     domain: string
     path: string
     token: string
-    connectedCallback: Function
-    disconnectedCallback: Function
-    receiveCallback: Function
     constructor({
         domain = defaultDomain,
         path = '',
-        token = '',
-        connectedCallback = function () { }, // 连接成功回调事件
-        disconnectedCallback = function () {}, // 断开连接回调函数
-        receiveCallback = function () {} // 接收消息回调函数
+        token = ''
     }) {
         this.domain = domain
         this.path = path
         this.token = token
-        this.connectedCallback = connectedCallback
-        this.disconnectedCallback = disconnectedCallback
-        this.receiveCallback = receiveCallback
+        this.initSocket()
     }
     initSocket() {
         this.socket = io(this.domain, {
@@ -51,25 +43,44 @@ class SocketManager {
         })
         this.socket.on('connect', () => {
             console.log('connect successfully!')
-            this.connectedCallback()
         })
         this.socket.on('disconnect', (reason: string) => {
             // 服务器/客户端（disconnect）主动断开，需要手动重连
             if (reason === 'io server disconnect') {
                 this.socket?.connect()
             }
-            this.disconnectedCallback(reason)
-            // 其他情况自动重连 ping timeout/transport close/transport error
+            // 其他情况自动重连 【ping timeout/transport close/transport error】
         })
     }
     // 发送消息
     sendMessage(msgBody: MsgBody) {
         this.socket?.emit('msg', msgBody)
     }
+    /**
+     *  绑定事件
+     * @param type 事件类型
+     * @param fn 事件
+     */
+    bindEvent (type: string, fn: Function) {
+        interface EventMap {
+            [key:string]: Function
+        }
+        const map: EventMap = {
+            ['on-receive-message']: () => this.onReceiveMessage(fn), // fn为外界传入的接收消息的回调函数
+            ['on-disconnect']: () => this.onDisconnect(fn)
+        }
+        
+        return map[type] && map[type]()
+    }
     // 接收消息
-    receiveMessage () {
+    onReceiveMessage (fn: Function) {
         this.socket?.on('msg', (msgBody:MsgType) => {
-            this.receiveCallback(msgBody)
+            fn(msgBody)
+        })
+    }
+    onDisconnect (fn: Function) {
+        this.socket?.on('disconnect', (reason:string) => {
+            fn(reason)
         })
     }
     // 断开连接
@@ -77,3 +88,5 @@ class SocketManager {
         this.socket?.disconnect()
     }
 }
+
+export default SocketManager

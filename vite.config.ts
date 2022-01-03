@@ -12,7 +12,7 @@ export default defineConfig({
         alias: {
             "@": resolve(__dirname,'./src')
         },
-        extensions: ['.vue', '.ts', '.tsx', '.less', '.css']
+        extensions: ['.vue', '.ts', '.tsx','js', 'jsx','.less', '.css']
     },
     build: {
         target: 'modules',
