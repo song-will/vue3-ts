@@ -3,18 +3,30 @@
         <el-input
             @paste="onPaste"
             ref="refInput"
-            v-model="inputValue"
+            v-model="msgBody.content"
             type="textarea"
             @keydown.enter="handleEnter"
         ></el-input>
     </div>
 </template>
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
 import { key } from '@/store'
 import { useStore } from 'vuex';
 
-const inputValue = ref('')
+interface MsgBody {
+    content: string
+    senderUuid: string
+    receiverUuid: string
+    msgType: string
+}
+
+const msgBody = reactive<MsgBody>({
+    content: '',
+    senderUuid: '',
+    receiverUuid: '',
+    msgType: 'text'
+})
 const refInput = ref(null as HTMLElement | null)
 
 const onPaste = (event: ClipboardEvent) => {
@@ -56,14 +68,16 @@ const handleEnter = (event: KeyboardEvent): void => {
     if (event.keyCode === 229) {
         return
     }
+    if (!msgBody.content) return
+    msgBody.senderUuid = store.state?.userInfo?.uuid
+    msgBody.receiverUuid = store.state?.currentChatPerson?.uuid
     // 取消回车换行
     event.preventDefault()
-    console.log('socketManager', store.state.socketManager.sendMessage)
-    store.state.socketManager.sendMessage(inputValue.value)
-    inputValue.value = ''
+    store?.state?.socketManager?.sendMessage(msgBody)
+    msgBody.content = ''
 }
 const init = () => {
-    store.state.socketManager.bindEvent('on-receive-message', function(msg: string) {
+    store?.state?.socketManager?.bindEvent('on-receive-message', function(msg: string) {
         console.log('msg', msg)
     })
 }

@@ -4,7 +4,7 @@
             <li v-for="(item, index) in userList" :key="index" @click="() => changeChat(item, index)">
                 <div class="list-item" :class="curActiveChatIndex === index ? 'active' : ''">
                     <div class="item-avatar">
-                        <el-avatar shape="square" :size="30" :src="getAssetsFile('image',item.avatarUrl)"></el-avatar >
+                        <el-avatar shape="square" :size="30" :src="item.avatarUrl"></el-avatar >
                     </div>
                     <div class="item-info">
                         <div class="info-desc">
@@ -21,40 +21,48 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { getAssetsFile, formatTime, lessThenBytes } from '../../utils';
-
-interface UserItem {
-    nick: string
-    avatarUrl: string
-    msgTime: string | number
-    content: string
-    msgType: string
+import { getFriendList } from "../../api";
+import { key } from '@/store'
+import { useStore } from 'vuex';
+enum MsgType {
+    TEXT = 'text',
+    VIDEO = 'video',
+    IMAGE = 'image'
 }
 
-let userList = reactive<UserItem[]>([
-    {
-        nick: 'song中事实上shini',
-        avatarUrl: 'lyf.jpeg',
-        msgTime: Date.now(),
-        content: 'hello',
-        msgType: 'text',
-    },
-    {
-        nick: 'liu',
-        avatarUrl: 'lyf.jpeg',
-        msgTime: Date.now(),
-        content: 'hello',
-        msgType: 'text',
-    }
-])
+interface UserItem {
+    username: string
+    avatarUrl?:string
+    nick: string
+    userId: string
+    msgType: MsgType
+    content: string
+    msgTime: number
+}
+
+let userList = ref<UserItem[]>([])
 const changeChat = (item:UserItem, index:number):void => {
     handleActive(index)
 }
 let curActiveChatIndex = ref(0)
+const store = useStore(key)
 const handleActive = (index: number):void => {
+    store.commit('setCurrentChatPerson', JSON.parse(JSON.stringify(userList.value[index]))) 
     curActiveChatIndex.value = index
 }
+
+const setFriendList = async () => {
+    const userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
+    if (!userInfo.userId) return
+    const data = await getFriendList({userId: userInfo.userId}).catch(err => {})
+    if (data) {
+        userList.value = data?.list
+        store.commit('setCurrentChatPerson', JSON.parse(JSON.stringify(userList.value[curActiveChatIndex.value])))
+    }
+}
+onMounted(setFriendList)
 </script>
 <style lang="less" scoped>
 .list-chat-wrapper {

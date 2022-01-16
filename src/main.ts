@@ -13,7 +13,10 @@ app.use(store, key)
 app.use(ElementPlus)
 
 window.onload = function () {
-    store.commit('initSocket')
+    store.commit('initSocket', {
+        token: JSON.parse(sessionStorage.getItem('userInfo'))?.uuid 
+    })
+    store.commit('setUserInfo')
 }
 console.log('state', store.state.socketManager)
 app.mount('#app')

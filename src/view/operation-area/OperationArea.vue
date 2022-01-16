@@ -33,8 +33,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ChatRound, Avatar } from "@element-plus/icons-vue";
-import { reactive, ref, defineEmits, defineProps, watch, onMounted } from 'vue'
+import { ChatRound, Avatar } from "@element-plus/icons-vue"
+import { reactive, ref, watch, onMounted } from 'vue'
 
 const props = defineProps({
     currentType: String
@@ -49,6 +49,12 @@ enum ColorEnum {
 interface IconColorMap {
     [CHAT: string]: string
     CONTACTS: string
+}
+
+interface Friend {
+    nick: string
+    username: string
+    avatarUrl: string
 }
 
 const iconColorMap = reactive<IconColorMap>({
@@ -66,6 +72,8 @@ const changeOperation = (type: string): void => {
 onMounted(() => {
     changeOperation(props.currentType as string)
 })
+
+
 
 
 </script>

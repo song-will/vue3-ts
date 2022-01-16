@@ -5,7 +5,7 @@
 </template>
 <script lang="ts" setup>
 import ContentChat from './ContentChat.vue'
-import { computed, defineProps } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({
     currentType: String

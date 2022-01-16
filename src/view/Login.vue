@@ -36,18 +36,12 @@ const formData = reactive<FormData>({
 const store = useStore(key)
 console.log('store', store.state.count)
 const submit = async () => {
-    const data = await userLogin(formData).catch(err => {
-        console.error('err', err)
-    })
-    console.log('data', data)
-    // store.commit('increment')
-    // console.log('store', store.state.count)
-    store.commit('initSocket', {
-        token: data,
-        connectedCallback () {
-        }
-    })
-    linkToHome();
+    const res = await userLogin(formData).catch(err => {}) 
+    if (res) {
+        sessionStorage.setItem('userInfo', JSON.stringify(res))
+        store.commit('setUserInfo')
+        linkToHome();
+    }
 };
 const router = useRouter();
 const linkToHome = () => {

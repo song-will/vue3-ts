@@ -42,6 +42,7 @@ class SocketManager {
             }
         })
         this.socket.on('connect', () => {
+            this.socket?.emit('msg', 'connect')
             console.log('connect successfully!')
         })
         this.socket.on('disconnect', (reason: string) => {
